@@ -1,0 +1,33 @@
+{
+  "name": "actor-reddit-scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Reddit Ultimate All-in-One Scraper on Apify. Extracts Subreddits, Posts, Comments & Threaded Replies, User Profiles, Media (Images/Videos), and Keyword Search across Reddit.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node src/main.js"
+  },
+  "keywords": [
+    "apify",
+    "actor",
+    "reddit",
+    "reddit-scraper",
+    "subreddits",
+    "posts",
+    "comments",
+    "threaded-replies",
+    "user-profiles",
+    "sentiment-analysis",
+    "crawlee",
+    "playwright"
+  ],
+  "author": "Khalil",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "apify": "^3.2.6",
+    "crawlee": "^3.12.2",
+    "got-scraping": "^4.0.7",
+    "playwright": "^1.49.1"
+  }
+}
