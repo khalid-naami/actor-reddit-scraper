@@ -1,0 +1,125 @@
+{
+    "title": "Reddit Ultimate Scraper Input Schema",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "Scraping Mode",
+            "type": "string",
+            "description": "Select Reddit data extraction mode, or use AUTO_DETECT.",
+            "default": "AUTO_DETECT",
+            "editor": "select",
+            "enum": [
+                "AUTO_DETECT",
+                "POSTS",
+                "COMMENTS",
+                "SUBREDDITS",
+                "USERS",
+                "SEARCH"
+            ],
+            "enumTitles": [
+                "Auto-Detect (From URLs)",
+                "Posts (From Subreddits or Direct Post URLs)",
+                "Comments & Threaded Replies (Nested Trees)",
+                "Subreddits (Metrics, Rules, Subscribers, Sidebar)",
+                "Users & Profiles (Bio, Karma, History)",
+                "Search Keywords (Query & Filters)"
+            ]
+        },
+        "targetUrls": {
+            "title": "Target Reddit URLs",
+            "type": "array",
+            "description": "List of Reddit URLs (Subreddits, Post URLs, or User Profiles).",
+            "editor": "stringList",
+            "prefill": [
+                "https://www.reddit.com/r/technology/hot/",
+                "https://www.reddit.com/r/OpenAI/"
+            ]
+        },
+        "searchQueries": {
+            "title": "Search Keywords / Queries",
+            "type": "array",
+            "description": "Keywords to search across Reddit when using SEARCH mode.",
+            "editor": "stringList",
+            "prefill": [
+                "artificial intelligence news"
+            ]
+        },
+        "sort": {
+            "title": "Sort Method",
+            "type": "string",
+            "description": "Sorting criteria for subreddit posts and search results.",
+            "default": "hot",
+            "editor": "select",
+            "enum": [
+                "hot",
+                "new",
+                "top",
+                "rising",
+                "relevance"
+            ],
+            "enumTitles": [
+                "Hot (Trending now)",
+                "New (Most recent)",
+                "Top (Highest score)",
+                "Rising",
+                "Relevance (For search)"
+            ]
+        },
+        "timeFilter": {
+            "title": "Time Filter (For Top & Search)",
+            "type": "string",
+            "description": "Time range filter when sorting by 'top' or searching.",
+            "default": "all",
+            "editor": "select",
+            "enum": [
+                "all",
+                "year",
+                "month",
+                "week",
+                "day",
+                "hour"
+            ],
+            "enumTitles": [
+                "All Time",
+                "Past Year",
+                "Past Month",
+                "Past Week",
+                "Past 24 Hours",
+                "Past Hour"
+            ]
+        },
+        "maxItems": {
+            "title": "Maximum Items Per Request",
+            "type": "integer",
+            "description": "Maximum number of posts, search results, or user items to scrape.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 5000
+        },
+        "maxComments": {
+            "title": "Maximum Comments Per Post",
+            "type": "integer",
+            "description": "Max comments & replies to extract per post.",
+            "default": 30,
+            "minimum": 0,
+            "maximum": 2000
+        },
+        "includeComments": {
+            "title": "Include Comments for Scraped Posts",
+            "type": "boolean",
+            "description": "If enabled, automatically extracts top comments alongside each post.",
+            "default": true
+        },
+        "proxyConfiguration": {
+            "title": "Proxy Configuration",
+            "type": "object",
+            "description": "Apify Proxy (RESIDENTIAL recommended for Reddit to avoid rate limits).",
+            "editor": "proxy",
+            "default": {
+                "useApifyProxy": true
+            }
+        }
+    },
+    "required": []
+}
