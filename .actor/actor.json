@@ -1,0 +1,25 @@
+{
+    "actorSpecification": 1,
+    "name": "reddit-ultimate-scraper",
+    "title": "Reddit Ultimate Scraper (Posts, Comments, Subreddits & Users)",
+    "description": "Comprehensive all-in-one Reddit scraper. Extracts Posts with markdown text & media, nested Comments & Threaded Replies, Subreddit metrics & rules, User Profiles & Karma, Keyword Search, and Community trends for market research & AI datasets.",
+    "version": "1.0.0",
+    "meta": {
+        "templateId": "js-crawlee-playwright"
+    },
+    "dockerfile": "./Dockerfile",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "output": "./output_schema.json",
+    "categories": [
+        "SOCIAL_MEDIA",
+        "MARKETING",
+        "AI",
+        "RESEARCH"
+    ],
+    "environmentVariables": {
+        "APIFY_DISABLE_BROWSER_SANDBOX": "1"
+    }
+}
