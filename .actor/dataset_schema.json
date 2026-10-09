@@ -1,0 +1,128 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string",
+                "title": "Entity Type"
+            },
+            "url": {
+                "type": "string",
+                "title": "Reddit URL"
+            },
+            "id": {
+                "type": "string",
+                "title": "Reddit Item ID"
+            },
+            "title": {
+                "type": "string",
+                "title": "Post / Subreddit Title"
+            },
+            "body": {
+                "type": "string",
+                "title": "Post Text / Comment Body"
+            },
+            "author": {
+                "type": "string",
+                "title": "Author Username"
+            },
+            "subreddit": {
+                "type": "string",
+                "title": "Subreddit (e.g. r/technology)"
+            },
+            "subredditId": {
+                "type": "string",
+                "title": "Subreddit ID"
+            },
+            "score": {
+                "type": "integer",
+                "title": "Score / Upvotes"
+            },
+            "upvoteRatio": {
+                "type": "number",
+                "title": "Upvote Ratio (0.0 - 1.0)"
+            },
+            "numComments": {
+                "type": "integer",
+                "title": "Comments Count"
+            },
+            "postType": {
+                "type": "string",
+                "title": "Post Type (text, link, image, video, gallery)"
+            },
+            "flair": {
+                "type": "string",
+                "title": "Post Flair"
+            },
+            "isNsfw": {
+                "type": "boolean",
+                "title": "Is NSFW (Over 18)"
+            },
+            "isSpoiler": {
+                "type": "boolean",
+                "title": "Is Spoiler"
+            },
+            "isStickied": {
+                "type": "boolean",
+                "title": "Is Stickied / Pinned"
+            },
+            "mediaUrl": {
+                "type": "string",
+                "title": "Direct Image / Media URL"
+            },
+            "galleryUrls": {
+                "type": "array",
+                "title": "Gallery Images URLs"
+            },
+            "videoUrl": {
+                "type": "string",
+                "title": "Reddit Video URL"
+            },
+            "externalUrl": {
+                "type": "string",
+                "title": "External Link URL"
+            },
+            "parentId": {
+                "type": "string",
+                "title": "Parent Item ID"
+            },
+            "depth": {
+                "type": "integer",
+                "title": "Comment Nesting Depth"
+            },
+            "subscribers": {
+                "type": "integer",
+                "title": "Subreddit Subscribers"
+            },
+            "activeUsers": {
+                "type": "integer",
+                "title": "Subreddit Active Users"
+            },
+            "subDescription": {
+                "type": "string",
+                "title": "Subreddit Description"
+            },
+            "userKarma": {
+                "type": "integer",
+                "title": "User Total Karma"
+            },
+            "userPostKarma": {
+                "type": "integer",
+                "title": "User Post Karma"
+            },
+            "userCommentKarma": {
+                "type": "integer",
+                "title": "User Comment Karma"
+            },
+            "createdAt": {
+                "type": "string",
+                "title": "Publication Timestamp"
+            },
+            "scrapedAt": {
+                "type": "string",
+                "title": "Scraped At Timestamp"
+            }
+        }
+    }
+}
