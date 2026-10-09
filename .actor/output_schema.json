@@ -1,0 +1,18 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Reddit Ultimate Scraper Output",
+    "properties": {
+        "results": {
+            "type": "string",
+            "title": "Dataset Records",
+            "description": "Scraped Reddit records (Posts, Comments, Subreddits, Users, Search Results)",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        },
+        "overview": {
+            "type": "string",
+            "title": "Executive Summary Payload",
+            "description": "High-level summary report and execution metrics stored in Key-Value store",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/OUTPUT"
+        }
+    }
+}
