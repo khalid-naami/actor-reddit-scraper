@@ -1,7 +1,9 @@
 {
     "actorSpecification": 1,
     "fields": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
+        "additionalProperties": true,
         "properties": {
             "type": {
                 "type": "string",
@@ -15,6 +17,10 @@
                 "type": "string",
                 "title": "Reddit Item ID"
             },
+            "name": {
+                "type": "string",
+                "title": "Fullname / Subreddit Name"
+            },
             "title": {
                 "type": "string",
                 "title": "Post / Subreddit Title"
@@ -23,9 +29,25 @@
                 "type": "string",
                 "title": "Post Text / Comment Body"
             },
+            "description": {
+                "type": "string",
+                "title": "Subreddit Description"
+            },
             "author": {
                 "type": "string",
                 "title": "Author Username"
+            },
+            "authorRaw": {
+                "type": "string",
+                "title": "Raw Author Name"
+            },
+            "username": {
+                "type": "string",
+                "title": "Reddit User Handle"
+            },
+            "bio": {
+                "type": "string",
+                "title": "User Profile Bio"
             },
             "subreddit": {
                 "type": "string",
@@ -67,13 +89,18 @@
                 "type": "boolean",
                 "title": "Is Stickied / Pinned"
             },
+            "isLocked": {
+                "type": "boolean",
+                "title": "Is Locked"
+            },
             "mediaUrl": {
                 "type": "string",
                 "title": "Direct Image / Media URL"
             },
             "galleryUrls": {
                 "type": "array",
-                "title": "Gallery Images URLs"
+                "title": "Gallery Images URLs",
+                "items": { "type": "string" }
             },
             "videoUrl": {
                 "type": "string",
@@ -83,6 +110,18 @@
                 "type": "string",
                 "title": "External Link URL"
             },
+            "topComments": {
+                "type": "array",
+                "title": "Top Comments"
+            },
+            "postId": {
+                "type": "string",
+                "title": "Parent Post ID"
+            },
+            "postTitle": {
+                "type": "string",
+                "title": "Parent Post Title"
+            },
             "parentId": {
                 "type": "string",
                 "title": "Parent Item ID"
@@ -90,6 +129,14 @@
             "depth": {
                 "type": "integer",
                 "title": "Comment Nesting Depth"
+            },
+            "isOp": {
+                "type": "boolean",
+                "title": "Is Original Poster"
+            },
+            "distinguished": {
+                "type": "string",
+                "title": "Distinguished Badge"
             },
             "subscribers": {
                 "type": "integer",
@@ -101,7 +148,19 @@
             },
             "subDescription": {
                 "type": "string",
-                "title": "Subreddit Description"
+                "title": "Subreddit Description (Legacy)"
+            },
+            "rules": {
+                "type": "array",
+                "title": "Subreddit Rules"
+            },
+            "iconUrl": {
+                "type": "string",
+                "title": "Icon Image URL"
+            },
+            "bannerUrl": {
+                "type": "string",
+                "title": "Banner Image URL"
             },
             "userKarma": {
                 "type": "integer",
@@ -115,6 +174,31 @@
                 "type": "integer",
                 "title": "User Comment Karma"
             },
+            "isGold": {
+                "type": "boolean",
+                "title": "Is Reddit Premium / Gold"
+            },
+            "isVerified": {
+                "type": "boolean",
+                "title": "Is Verified Account"
+            },
+            "emails": {
+                "type": "array",
+                "title": "Extracted Contact Emails",
+                "items": { "type": "string" }
+            },
+            "socialLinks": {
+                "type": "array",
+                "title": "Extracted Social Links"
+            },
+            "searchQuery": {
+                "type": "string",
+                "title": "Matched Search Query"
+            },
+            "source": {
+                "type": "string",
+                "title": "Extraction Source Engine"
+            },
             "createdAt": {
                 "type": "string",
                 "title": "Publication Timestamp"
@@ -122,6 +206,38 @@
             "scrapedAt": {
                 "type": "string",
                 "title": "Scraped At Timestamp"
+            }
+        }
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "type",
+                    "subreddit",
+                    "title",
+                    "author",
+                    "score",
+                    "numComments",
+                    "postType",
+                    "url",
+                    "createdAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "type": { "label": "Type", "format": "text" },
+                    "subreddit": { "label": "Subreddit", "format": "text" },
+                    "title": { "label": "Title", "format": "text" },
+                    "author": { "label": "Author", "format": "text" },
+                    "score": { "label": "Score", "format": "number" },
+                    "numComments": { "label": "Comments", "format": "number" },
+                    "postType": { "label": "Format", "format": "text" },
+                    "url": { "label": "URL", "format": "link" },
+                    "createdAt": { "label": "Created At", "format": "date" }
+                }
             }
         }
     }
