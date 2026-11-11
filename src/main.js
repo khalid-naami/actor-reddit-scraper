@@ -228,7 +228,7 @@ try {
             headers.Cookie = cookieHeader;
         }
 
-        const maxAttempts = isResidentialProxy ? 2 : 1;
+        const maxAttempts = proxyConfig ? (isResidentialProxy ? 3 : 3) : 1;
         let lastFailure = null;
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -267,7 +267,7 @@ try {
                 }
             } else {
                 lastFailure = { ok: false, block, reason: block.reason };
-                if (block.statusCode === 403 && !hasCookies && !isResidentialProxy && !proxyConfig) {
+                if (block.statusCode === 403 && !hasCookies && !proxyConfig) {
                     state.unauthJsonBlocked = true;
                     break;
                 }
@@ -277,12 +277,16 @@ try {
         return lastFailure || { ok: false, reason: 'Reddit JSON request failed' };
     }
 
-    // Tier 3: Polite Atom .rss fetcher honoring x-ratelimit-reset / retry-after headers
+    // Tier 3: Polite Atom .rss fetcher honoring x-ratelimit-reset / retry-after headers & proxy rotation
     async function fetchRedditRss(rssUrl) {
-        const maxAttempts = 2;
+        const maxAttempts = proxyConfig ? 3 : 2;
+        let lastReason = 'Reddit RSS request failed';
+        let lastBlock = null;
+
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
             const now = Date.now();
-            const waitUntil = Math.max(state.nextRssEarliestAt, state.lastRssFetchAt + 2000);
+            const minGapMs = proxyConfig ? 500 : 2000;
+            const waitUntil = Math.max(state.nextRssEarliestAt, state.lastRssFetchAt + minGapMs);
             if (waitUntil > now) {
                 await sleep(waitUntil - now);
             }
@@ -295,14 +299,20 @@ try {
             if (cookieHeader) {
                 headers.Cookie = cookieHeader;
             }
+            if (attempt === 0) {
+                headers['User-Agent'] = OAUTH_USER_AGENT;
+            }
 
             const proxyUrl = await getProxyUrl();
             const res = await gotScraping({
                 url: rssUrl,
-                headerGeneratorOptions: {
-                    browsers: [{ name: 'chrome', minVersion: 124 }],
-                    operatingSystems: ['windows', 'macos']
-                },
+                useHeaderGenerator: attempt > 0,
+                ...(attempt > 0 ? {
+                    headerGeneratorOptions: {
+                        browsers: [{ name: 'chrome', minVersion: 124 }],
+                        operatingSystems: ['windows', 'macos']
+                    }
+                } : {}),
                 headers,
                 proxyUrl,
                 responseType: 'text',
@@ -313,7 +323,7 @@ try {
 
             const remaining = Number(res.headers['x-ratelimit-remaining']);
             const resetSecs = Number(res.headers['x-ratelimit-reset']);
-            if (Number.isFinite(remaining) && remaining <= 1) {
+            if (Number.isFinite(remaining) && remaining <= 1 && !proxyConfig) {
                 const resetWaitMs = Number.isFinite(resetSecs) && resetSecs > 0
                     ? Math.min(12000, (resetSecs + 1) * 1000)
                     : 4000;
@@ -324,7 +334,7 @@ try {
                 const retryAfterSecs = Number(res.headers['retry-after']);
                 const backoffMs = Number.isFinite(retryAfterSecs) && retryAfterSecs > 0
                     ? Math.min(15000, retryAfterSecs * 1000)
-                    : (Number.isFinite(resetSecs) && resetSecs > 0 ? Math.min(12000, (resetSecs + 2) * 1000) : 5000);
+                    : (Number.isFinite(resetSecs) && resetSecs > 0 ? Math.min(12000, (resetSecs + 2) * 1000) : 4500);
                 log.warning(`⏳ Reddit RSS rate-limited (HTTP 429). Waiting ${Math.round(backoffMs / 1000)}s before retrying...`);
                 await sleep(backoffMs);
                 continue;
@@ -339,6 +349,11 @@ try {
             });
 
             if (block.blocked) {
+                lastBlock = block;
+                lastReason = block.reason;
+                if (proxyConfig && attempt + 1 < maxAttempts) {
+                    continue;
+                }
                 return { ok: false, block, reason: block.reason };
             }
 
@@ -346,18 +361,18 @@ try {
                 return { ok: true, xml: res.body, source: 'rss' };
             }
 
-            return { ok: false, reason: 'Expected Atom <feed> XML from Reddit .rss endpoint' };
+            lastReason = 'Expected Atom <feed> XML from Reddit .rss endpoint';
         }
 
-        return { ok: false, reason: 'Reddit RSS request failed after retries' };
+        return { ok: false, block: lastBlock, reason: lastReason };
     }
 
     // Tier 4: Crawlee 3.16 compatible Playwright fallback (strictly detects challenges/blocks without bypassing)
     async function fetchWithPlaywright(targetUrl, options = {}) {
-        if (state.playwrightChallengeBlocked && !hasCookies && !isResidentialProxy) {
+        if (state.playwrightChallengeBlocked && !hasCookies && !proxyConfig) {
             return {
                 ok: false,
-                reason: 'Reddit previously presented anti-bot JS/network block to Playwright without cookies or Residential proxy'
+                reason: 'Reddit previously presented anti-bot JS/network block to Playwright without cookies or proxies'
             };
         }
 
@@ -375,8 +390,7 @@ try {
             const crawler = new PlaywrightCrawler({
                 requestQueue,
                 proxyConfiguration: proxyConfig,
-                maxRequestsPerCrawl: 1,
-                maxRequestRetries: 1,
+                maxRequestRetries: proxyConfig ? 2 : 0,
                 headless: true,
                 navigationTimeoutSecs: 35,
                 requestHandlerTimeoutSecs: 45,
@@ -424,14 +438,14 @@ try {
                     });
 
                     if (block.blocked) {
-                        if (block.challenge || block.statusCode === 403) {
+                        if ((block.challenge || block.statusCode === 403) && !hasCookies && !proxyConfig) {
                             state.playwrightChallengeBlocked = true;
                         }
                         outcome = { ok: false, block, reason: block.reason };
                         return;
                     }
 
-                    // Extract rich DOM data from rendered Shreddit web components if present
+                    // Extract rich DOM data from rendered Shreddit / Search web components if present
                     const domData = await page.evaluate(({ maxP, maxC }) => {
                         const posts = [];
                         document.querySelectorAll('shreddit-post').forEach((el) => {
@@ -452,6 +466,35 @@ try {
                             });
                         });
 
+                        if (posts.length === 0) {
+                            const seenUrls = new Set();
+                            document.querySelectorAll('a[data-testid="post-title"], a[data-testid="post-title-text"], [data-testid="post-title"] a[href*="/comments/"]').forEach((anchor) => {
+                                if (posts.length >= maxP) return;
+                                const href = anchor.getAttribute('href') || '';
+                                const titleText = (anchor.innerText || anchor.getAttribute('aria-label') || '').trim();
+                                if (!href || !titleText || seenUrls.has(href)) return;
+                                seenUrls.add(href);
+                                const idMatch = href.match(/\/comments\/([a-z0-9]+)/i);
+                                const subMatch = href.match(/\/r\/([^/?#]+)/i);
+                                const container = anchor.closest('[data-testid="search-post-unit"], [data-testid="post-container"], faceplate-tracker, article, div');
+                                const authorLink = container?.querySelector('a[href*="/user/"], a[href*="/u/"]');
+                                const rawAuthor = authorLink ? (authorLink.innerText || '').replace(/^\/?u\//i, '').trim() : '';
+                                posts.push({
+                                    id: idMatch ? `t3_${idMatch[1]}` : '',
+                                    title: titleText,
+                                    author: rawAuthor,
+                                    subreddit: subMatch ? `r/${subMatch[1]}` : '',
+                                    permalink: href.startsWith('/') ? href : '',
+                                    contentHref: href,
+                                    score: '0',
+                                    commentCount: '0',
+                                    postType: 'text',
+                                    createdAt: '',
+                                    body: ''
+                                });
+                            });
+                        }
+
                         const comments = [];
                         document.querySelectorAll('shreddit-comment').forEach((el) => {
                             if (comments.length >= maxC) return;
@@ -467,7 +510,7 @@ try {
                             });
                         });
 
-                        return { posts, comments };
+                        return { posts, comments, pageTitle: document.title || '' };
                     }, { maxP: maxDomItems, maxC: maxDomComments }).catch(() => null);
 
                     if (domData && (domData.posts.length > 0 || domData.comments.length > 0)) {
@@ -530,7 +573,7 @@ try {
 
                     outcome = {
                         ok: false,
-                        reason: 'Playwright page loaded without extractable Reddit JSON or <shreddit-post> elements'
+                        reason: `Playwright HTTP ${statusCode} (title="${domData?.pageTitle || ''}") without extractable Reddit JSON or post elements`
                     };
                 },
                 failedRequestHandler({ request }, err) {
@@ -987,7 +1030,7 @@ try {
                         }
                     } else if (collected === 0) {
                         throw new Error(
-                            `Reddit blocked unauthenticated Search for "${query}" (${searchFailureReason}). Provide free redditClientId + redditClientSecret, customCookies, or Apify Residential proxies.`
+                            `Search failed for "${query}": JSON (${searchFailureReason}), Playwright (${pwRes.reason}), RSS (${rssRes.reason}). Provide free redditClientId + redditClientSecret, customCookies, or Apify Residential proxies.`
                         );
                     }
                 }
