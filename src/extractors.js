@@ -869,6 +869,34 @@ export function parseRedditHtmlDom(html, options = {}) {
         }));
     }
 
+    if (out.posts.length === 0) {
+        const searchAnchorRegex = /<a\b[^>]*data-testid=["']post-title(?:-text)?["'][^>]*>([\s\S]*?)<\/a>/gi;
+        let m;
+        while ((m = searchAnchorRegex.exec(html)) !== null && out.posts.length < maxItems) {
+            const anchorTag = m[0];
+            const href = cleanUrl(readTagAttr(anchorTag, 'href'));
+            const title = stripHtmlTags(m[1]) || readTagAttr(anchorTag, 'aria-label') || '';
+            if (!href || !title) continue;
+            const idMatch = href.match(/\/comments\/([a-z0-9]+)\//i);
+            const subMatch = href.match(/\/r\/([^/?#]+)\//i);
+            const postId = idMatch ? idMatch[1] : undefined;
+            out.posts.push(sanitizeRecord({
+                type: 'POST',
+                id: postId,
+                name: postId ? `t3_${postId}` : undefined,
+                url: href,
+                title,
+                body: '',
+                author: '[deleted]',
+                authorRaw: '[deleted]',
+                subreddit: subMatch ? `r/${subMatch[1]}` : undefined,
+                postType: 'text',
+                source: 'reddit_dom',
+                scrapedAt: new Date().toISOString()
+            }));
+        }
+    }
+
     const commentTags = html.match(/<shreddit-comment\b[^>]*>/gi) || [];
     for (const tag of commentTags) {
         if (out.comments.length >= maxComments) break;
