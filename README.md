@@ -29,7 +29,10 @@ Comprehensive, high-speed, all-in-one Reddit scraper on Apify. Extract **Posts**
 | `maxItems` | Integer | `50` | Maximum posts, search results, or items to scrape. |
 | `maxComments` | Integer | `30` | Maximum comments and replies per post. |
 | `includeComments`| Boolean | `true` | Automatically extract top comments alongside posts. |
-| `proxyConfiguration` | Object | `{ useApifyProxy: true }` | Apify Residential proxy configuration (recommended). |
+| `proxyConfiguration` | Object | `{ useApifyProxy: true }` | Apify proxy configuration (`RESIDENTIAL` recommended for full JSON & Search). |
+| `redditClientId` | String | `""` | Optional free Reddit App Client ID (`https://www.reddit.com/prefs/apps`) for `oauth.reddit.com`. |
+| `redditClientSecret` | String | `""` | Optional Reddit App Client Secret paired with `redditClientId`. |
+| `customCookies` | String | `""` | Optional Reddit session cookies (JSON array or `Cookie` header string) for authenticated access. |
 
 ---
 
