@@ -114,11 +114,31 @@
         "proxyConfiguration": {
             "title": "Proxy Configuration",
             "type": "object",
-            "description": "Apify Proxy (RESIDENTIAL recommended for Reddit to avoid rate limits).",
+            "description": "Apify Proxy settings. Reddit frequently blocks datacenter/cloud IPs with HTTP 403 on .json/search endpoints; RESIDENTIAL proxies or Reddit OAuth credentials below are recommended.",
             "editor": "proxy",
             "default": {
                 "useApifyProxy": true
             }
+        },
+        "redditClientId": {
+            "title": "Reddit OAuth Client ID (Optional)",
+            "type": "string",
+            "description": "Optional free Reddit App Client ID (from https://www.reddit.com/prefs/apps) to use official oauth.reddit.com JSON API reliably without proxy blocks.",
+            "editor": "textfield"
+        },
+        "redditClientSecret": {
+            "title": "Reddit OAuth Client Secret (Optional)",
+            "type": "string",
+            "description": "Optional Reddit App Client Secret paired with Client ID for official OAuth API access.",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "customCookies": {
+            "title": "Reddit Session Cookies (Optional)",
+            "type": "string",
+            "description": "Optional Reddit cookies (JSON array or 'reddit_session=...; token_v2=...' string) for authenticated access without OAuth app keys.",
+            "editor": "textarea",
+            "isSecret": true
         }
     },
     "required": []
