@@ -1,0 +1,15 @@
+{
+  "actorKeyValueStoreSchemaVersion": 1,
+  "title": "Key-Value Store Schema",
+  "description": "Key-Value Store records produced by the Actor.",
+  "collections": {
+    "output": {
+      "title": "Execution Summary Output",
+      "description": "Structured execution summary written to the OUTPUT key.",
+      "key": "OUTPUT",
+      "contentTypes": [
+        "application/json"
+      ]
+    }
+  }
+}
