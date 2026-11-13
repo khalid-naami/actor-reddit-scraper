@@ -100,7 +100,9 @@
             "galleryUrls": {
                 "type": "array",
                 "title": "Gallery Images URLs",
-                "items": { "type": "string" }
+                "items": {
+                    "type": "string"
+                }
             },
             "videoUrl": {
                 "type": "string",
@@ -112,7 +114,11 @@
             },
             "topComments": {
                 "type": "array",
-                "title": "Top Comments"
+                "title": "Top Comments",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
             },
             "postId": {
                 "type": "string",
@@ -152,7 +158,11 @@
             },
             "rules": {
                 "type": "array",
-                "title": "Subreddit Rules"
+                "title": "Subreddit Rules",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
             },
             "iconUrl": {
                 "type": "string",
@@ -185,11 +195,17 @@
             "emails": {
                 "type": "array",
                 "title": "Extracted Contact Emails",
-                "items": { "type": "string" }
+                "items": {
+                    "type": "string"
+                }
             },
             "socialLinks": {
                 "type": "array",
-                "title": "Extracted Social Links"
+                "title": "Extracted Social Links",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
             },
             "searchQuery": {
                 "type": "string",
@@ -207,7 +223,8 @@
                 "type": "string",
                 "title": "Scraped At Timestamp"
             }
-        }
+        },
+        "required": []
     },
     "views": {
         "overview": {
@@ -228,15 +245,42 @@
             "display": {
                 "component": "table",
                 "properties": {
-                    "type": { "label": "Type", "format": "text" },
-                    "subreddit": { "label": "Subreddit", "format": "text" },
-                    "title": { "label": "Title", "format": "text" },
-                    "author": { "label": "Author", "format": "text" },
-                    "score": { "label": "Score", "format": "number" },
-                    "numComments": { "label": "Comments", "format": "number" },
-                    "postType": { "label": "Format", "format": "text" },
-                    "url": { "label": "URL", "format": "link" },
-                    "createdAt": { "label": "Created At", "format": "date" }
+                    "type": {
+                        "label": "Type",
+                        "format": "text"
+                    },
+                    "subreddit": {
+                        "label": "Subreddit",
+                        "format": "text"
+                    },
+                    "title": {
+                        "label": "Title",
+                        "format": "text"
+                    },
+                    "author": {
+                        "label": "Author",
+                        "format": "text"
+                    },
+                    "score": {
+                        "label": "Score",
+                        "format": "number"
+                    },
+                    "numComments": {
+                        "label": "Comments",
+                        "format": "number"
+                    },
+                    "postType": {
+                        "label": "Format",
+                        "format": "text"
+                    },
+                    "url": {
+                        "label": "URL",
+                        "format": "link"
+                    },
+                    "createdAt": {
+                        "label": "Created At",
+                        "format": "date"
+                    }
                 }
             }
         }
