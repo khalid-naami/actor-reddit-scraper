@@ -23,6 +23,11 @@ import {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const OAUTH_USER_AGENT = 'nodejs:actor-reddit-scraper:v1.0.0 (by /u/apify_reddit_scraper)';
 
+function isProxyTransportError(errOrStatus) {
+    const msg = String(errOrStatus?.message || errOrStatus || '');
+    return errOrStatus === 597 || errOrStatus === 407 || /597|UPSTREAM407|407|Proxy responded with|tunneling socket/i.test(msg);
+}
+
 await Actor.init();
 
 const diagnostics = [];
@@ -388,6 +393,7 @@ try {
             await requestQueue.addRequest({ url: targetUrl });
 
             const crawler = new PlaywrightCrawler({
+            maxConcurrency: 2,
                 requestQueue,
                 proxyConfiguration: proxyConfig,
                 maxRequestRetries: proxyConfig ? 2 : 0,
@@ -403,7 +409,7 @@ try {
                             gotoOptions.timeout = 35000;
                         }
                         if (cookiesArray.length > 0) {
-                            await page.context().addCookies(cookiesArray).catch(() => {});
+                            await page.context().addCookies(cookiesArray.map((c) => ({ ...c, sameSite: (!c.sameSite || String(c.sameSite).toLowerCase() === 'no_restriction') ? 'None' : c.sameSite }))).catch(() => {});
                         }
                         await page.route('**/*.{woff,woff2,mp4,webm,m4v,avi}', (route) => route.abort().catch(() => {}));
                     }
